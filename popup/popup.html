@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe On-Call Email Alerter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">V!</div>
+      <div>
+        <h1 class="brand-title">Vibe On-Call Alerter</h1>
+        <p class="brand-subtitle">Cibranium Labs • Chrome &amp; Edge</p>
+      </div>
+    </div>
+    <label class="toggle-switch" title="Enable or disable email monitoring">
+      <input type="checkbox" id="enabledToggle" checked>
+      <span class="toggle-slider"></span>
+    </label>
+  </header>
+
+  <!-- Active Alarm Banner (visible when an incident alarm is ringing) -->
+  <section id="activeAlarmPanel" class="active-alarm-panel hidden" role="alert">
+    <div class="alarm-panel-header">
+      <span class="alarm-pulse-dot"></span>
+      <strong>VIBE ON-CALL ALARM ACTIVE</strong>
+    </div>
+    <p id="activeAlarmSubject" class="alarm-subject"></p>
+    <p id="activeAlarmSender" class="alarm-sender"></p>
+    <div class="alarm-panel-actions">
+      <button type="button" id="ackAlarmBtn" class="btn btn-danger-solid">
+        🛑 Acknowledge &amp; Stop Sound
+      </button>
+      <button type="button" id="openMailTabBtn" class="btn btn-outline-light">
+        📬 Open Mail
+      </button>
+    </div>
+  </section>
+
+  <main class="app-main">
+    <!-- Section 1: Attach Email Account -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">1. Attach Your Email Account</h2>
+        <span id="connectionBadge" class="conn-badge conn-badge-warn">Checking...</span>
+      </div>
+
+      <div class="field-group">
+        <label for="monitoredEmailInput" class="field-label">Your Email Address</label>
+        <input
+          type="email"
+          id="monitoredEmailInput"
+          class="text-input"
+          placeholder="e.g. name@cibraniumlabs.com or @gmail.com"
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="field-group">
+        <label for="mailProviderSelect" class="field-label">Mail Provider</label>
+        <div class="keyword-input-row">
+          <select id="mailProviderSelect" class="select-input">
+            <option value="auto">Auto-detect (Outlook / Gmail)</option>
+            <option value="outlook">Microsoft 365 Outlook Web</option>
+            <option value="outlook-live">Outlook.com / Hotmail</option>
+            <option value="gmail">Google Mail (Gmail)</option>
+          </select>
+          <button type="button" id="connectMailboxBtn" class="btn btn-primary">
+            🔗 Attach &amp; Open Mail
+          </button>
+        </div>
+        <p id="connectionSubtext" class="helper-text">
+          Attach your email and keep its webmail tab open so incoming Vibe On-Call pages trigger immediately.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 2: Detection Rules -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">2. Vibe On-Call Keywords</h2>
+        <button type="button" id="resetKeywordsBtn" class="link-btn" title="Restore 'vibe on call', 'you are being paged', 'cibranium labs'">
+          Restore Vibe Preset
+        </button>
+      </div>
+
+      <div class="field-group">
+        <label for="keywordInput" class="field-label">Required Phrases / Keywords in Mail</label>
+        <div class="keyword-input-row">
+          <input
+            type="text"
+            id="keywordInput"
+            class="text-input"
+            placeholder="Add phrase (e.g. vibe on call, cibranium labs)..."
+            autocomplete="off"
+          >
+          <button type="button" id="addKeywordBtn" class="btn btn-secondary">Add</button>
+        </div>
+        <div id="keywordsList" class="keywords-chips" aria-label="Configured keywords"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="matchModeSelect" class="field-label">Keyword Match Logic</label>
+        <select id="matchModeSelect" class="select-input">
+          <option value="smart">Smart Vibe On-Call Match (Recommended)</option>
+          <option value="all">Strict: Require ALL phrases above</option>
+          <option value="any">Broad: Match ANY single phrase above</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="senderFilterInput" class="field-label">
+          Sender Filter <span class="muted">(optional, leave blank to match any)</span>
+        </label>
+        <input
+          type="text"
+          id="senderFilterInput"
+          class="text-input"
+          placeholder="Optional sender filter (e.g. vibe, oncall@)"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="checkbox-group">
+        <label class="checkbox-row">
+          <input type="checkbox" id="unreadOnlyCheckbox" checked>
+          <span>Only trigger on unread emails</span>
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="alertExistingCheckbox" checked>
+          <span>Alert on existing unread matches when mail tab opens</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Section 3: Sound & Alert Behavior -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">3. Alarm Sound &amp; Alerts</h2>
+      </div>
+
+      <div class="field-group">
+        <label for="soundTypeSelect" class="field-label">Alarm Sound Profile</label>
+        <div class="sound-select-row">
+          <select id="soundTypeSelect" class="select-input">
+            <option value="siren">🚨 Urgent Two-Tone Siren</option>
+            <option value="pager">📟 Incident Pager Beep</option>
+            <option value="chime">🔔 High-Priority Triad Chime</option>
+            <option value="radar">📡 Sonar / Radar Pulse</option>
+          </select>
+          <button type="button" id="previewSoundBtn" class="btn btn-secondary" title="Play a 1-second sample">
+            🔊 Preview
+          </button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="slider-header">
+          <label for="volumeSlider" class="field-label">Alarm Volume</label>
+          <span id="volumeValueLabel" class="volume-badge">90%</span>
+        </div>
+        <input type="range" id="volumeSlider" class="range-slider" min="10" max="100" step="5" value="90">
+      </div>
+
+      <div class="checkbox-group">
+        <label class="checkbox-row">
+          <input type="checkbox" id="loopSoundCheckbox" checked>
+          <span>Loop alarm sound continuously until acknowledged</span>
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="desktopNotifCheckbox" checked>
+          <span>Show OS desktop notification</span>
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="inPageBannerCheckbox" checked>
+          <span>Show flashing alert banner inside Outlook / Gmail</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Section 4: Test & Incident Log -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">4. Test &amp; Recent Pages</h2>
+        <button type="button" id="clearHistoryBtn" class="link-btn">Clear Log</button>
+      </div>
+
+      <button type="button" id="simulateIncidentBtn" class="btn btn-test-alarm">
+        🚨 Simulate Vibe On-Call Page Now
+      </button>
+
+      <div id="historyContainer" class="history-list"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span id="statusIndicator" class="status-text">Monitoring active for Outlook Web &amp; Gmail</span>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>
