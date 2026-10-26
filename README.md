@@ -17,22 +17,18 @@ A Manifest V3 browser extension for **Microsoft Edge** and **Google Chrome** tha
 ## 1. Install in Microsoft Edge or Google Chrome
 
 ### Microsoft Edge
-1. Open Edge and go to `edge://extensions`.
-2. Turn **ON** **Developer mode** (left sidebar).
-3. Click **Load unpacked** (or click the **Reload** icon if already loaded) and select:
-   ```text
-   C:\Users\2450585\.gemini\antigravity\scratch\vibe-incident-alerter
-   ```
-4. Click the **Extensions** puzzle icon in the Edge toolbar and pin **Vibe Incident Email Alerter**.
+1. Download and extract `vibe-incident-alerter.zip` to a folder on your computer.
+2. Open Edge and go to `edge://extensions`.
+3. Turn **ON** **Developer mode** (left sidebar).
+4. Click **Load unpacked** and select the extracted `vibe-incident-alerter` folder.
+5. Click the **Extensions** puzzle icon in the Edge toolbar and pin **Vibe Incident Email Alerter**.
 
 ### Google Chrome
-1. Open Chrome and go to `chrome://extensions`.
-2. Turn **ON** **Developer mode** (top-right).
-3. Click **Load unpacked** (or **Reload** if already loaded) and select:
-   ```text
-   C:\Users\2450585\.gemini\antigravity\scratch\vibe-incident-alerter
-   ```
-4. Pin **Vibe Incident Email Alerter** in your Chrome toolbar.
+1. Download and extract `vibe-incident-alerter.zip` to a folder on your computer.
+2. Open Chrome and go to `chrome://extensions`.
+3. Turn **ON** **Developer mode** (top-right).
+4. Click **Load unpacked** and select the extracted `vibe-incident-alerter` folder.
+5. Pin **Vibe Incident Email Alerter** in your Chrome toolbar.
 
 ---
 
